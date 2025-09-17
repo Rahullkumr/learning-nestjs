@@ -31,6 +31,9 @@ npm run start:dev
 # development (20x faster compilation and builds)
 npm run start:dev -- -b swc
 
+# Format with prettier
+npm run format
+
 # production mode
 npm run start:prod
 ```
