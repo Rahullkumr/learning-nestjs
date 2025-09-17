@@ -35,6 +35,8 @@ npm run start:dev -- -b swc
 npm run start:prod
 ```
 
+- Finally open a web browser and go to `localhost:3000` or use [Postman](https://www.postman.com/) for API testing
+
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:
