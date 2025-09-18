@@ -182,6 +182,32 @@ Content-Type: application/json
 
 ---
 
+## 💻 Run this project locally
+
+Follow these steps to get the project up and running on your machine:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/Rahullkumr/learning-nestjs.git
+
+# 2. Navigate into the project folder
+cd learning-nestjs
+
+# 3. Install dependencies
+npm install
+
+# 4. Create a database in MySQL (if not already created)
+CREATE DATABASE users;
+
+# 5. Update database credentials
+# Edit `src/app.module.ts` (or use `.env` configuration)
+
+# 6. Run the project in development mode
+npm run start:dev
+```
+
+---
+
 ## 📚 Resources
 
 - [NestJS Documentation](https://docs.nestjs.com)  
@@ -200,4 +226,5 @@ Content-Type: application/json
 - Implement authentication (JWT)  
 - Add pagination for `GET /users`  
 - Implement API documentation using `Swagger`
+
 ---
