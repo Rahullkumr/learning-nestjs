@@ -7,13 +7,7 @@
 <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
 <p align="center">
   <a href="https://www.npmjs.com/~nestjscore" target="_blank">
-    <img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" />
-  </a>
-  <a href="https://www.npmjs.com/~nestjscore" target="_blank">
     <img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" />
-  </a>
-  <a href="https://circleci.com/gh/nestjs/nest" target="_blank">
-    <img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" />
   </a>
 </p>
 
@@ -39,6 +33,8 @@ nest new learning-nestjs
 cd learning-nestjs
 ```
 
+> `Note`: No need to install **node_modules** (i.e `npm i`), it will be done automatically.
+
 ---
 
 ## ▶️ Running the project
@@ -59,48 +55,39 @@ npm run format
 
 Open your browser at 👉 `http://localhost:3000` or test APIs using `Postman`
 
+- **Hello World!** will be visible 
+
+✅ Congratulations your initial setup is done.
+
 ---
 
 ## 🛠️ Database Setup (MySQL)
 
-1. Make sure MySQL is running on your machine.
-2. Create a database:
+1. Download and install MySQL [click here](https://dev.mysql.com/downloads/installer/)
+
+2. Make sure MySQL is running on your machine.
+
+3. Create a database (give name as per your wish):
     ```sql
     CREATE DATABASE users;
     ```
-
-3. Update **`app.module.ts`** with your credentials:
-
-    ```typescript
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: "your_username",
-      password: 'your_password',
-      database: "users",
-      entities: [User],
-      synchronize: true, // Set to false in production
-    }),
-    ```
-
 ---
 
-## 📚 Generate `users` resource
+## 📚 REST API creation process
 
 ```bash
 nest generate resource users
 ```
 
-This generates:
-- REST API Controller  
-- CRUD Service  
-- DTOs (Data Transfer Objects)  
-- Entity file  
+- Select REST API
 
----
+- type `y` (for CRUD endpoints)
 
-## 📦 Other needed packages
+- This generates:
+  - REST API Controller  
+  - CRUD Service  
+  - DTOs (Data Transfer Objects)  
+  - Entity file  
 
 ```bash
 npm install --save @nestjs/typeorm typeorm mysql2
@@ -116,32 +103,117 @@ npm install --save @nestjs/typeorm typeorm mysql2
 
 ---
 
-## 👤 User Entity Example
+## Updation at code level
 
-```typescript
-@Entity()
-export class User {
-  // auto increment column
-  @PrimaryGeneratedColumn()
-  id: number;
+- Update import array in **app.module.ts** with your credentials like this:
 
-  @Column()
-  firstName: string;
+  ```typescript
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: '',        // enter your database username
+      password: '',        // enter your password 
+      database: 'users',   // enter your database name 
+      entities: [__dirname + '/**/entities/*.entity{.ts,.js}'],
+      synchronize: true, 
+      // Set to false in production
+      // true  -> drop previous table and create from starting
+      // false -> just update the existing table
+    }),
+    UsersModule
+  ],
+  ```
+- Fix the error (if any), by importing that module
 
-  @Column()
-  lastName: string;
+- Update **user.entity.ts** with the columns details (entity == table in db)
 
-  @Column()
-  email: string;
+  ```typescript
+  import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
-  @Column()
-  password: string;
-}
-```
+  @Entity()  // pass a name to change the tablename (default is user)
+  export class User {
+      // auto increment column
+      @PrimaryGeneratedColumn()
+      id: number;
+
+      @Column()
+      firstName: string;
+
+      @Column()
+      lastName: string;
+
+      @Column()
+      email: string;
+
+      @Column()
+      password: string;
+  }
+  ```
+
+- Update the **users.service.ts** like this:
+
+  ```ts
+  import { Injectable } from '@nestjs/common';
+  import { CreateUserDto } from './dto/create-user.dto';
+  import { UpdateUserDto } from './dto/update-user.dto';
+  import { Repository } from 'typeorm';
+  import { InjectRepository } from '@nestjs/typeorm';
+  import { User } from './entities/user.entity';
+
+  @Injectable()
+  export class UsersService {
+    constructor(
+      @InjectRepository(User)
+      private readonly userRepository: Repository<User>,
+    ){}
+
+    create(createUserDto: CreateUserDto) {
+      return this.userRepository.save(createUserDto);
+    }
+
+    findAll() {
+      return this.userRepository.find();
+    }
+
+    findOne(id: number) {
+      return this.userRepository.findOneBy({id});
+    }
+
+    update(id: number, updateUserDto: UpdateUserDto) {
+      return this.userRepository.update(id, updateUserDto);
+    }
+
+    remove(id: number) {
+      return this.userRepository.delete(id);
+    }
+  }
+  ```
+
+- Update **users.module.ts** like this:
+  ```ts
+  import { Module } from '@nestjs/common';
+  import { UsersService } from './users.service';
+  import { UsersController } from './users.controller';
+  import { TypeOrmModule } from '@nestjs/typeorm';
+  import { User } from './entities/user.entity';
+
+  @Module({
+    imports: [TypeOrmModule.forFeature([User])], // User is entity
+    controllers: [UsersController],
+    providers: [UsersService],
+  })
+  export class UsersModule {}
+  ```
+
+- Finally run the project using `npm run start:dev`
+
+- ✅ Congratulations your REST API with CRUD endpoints created successfully.
 
 ---
 
-## 📌 API Endpoints
+## 📌 Testing API Endpoints in Postman
 
 | Method | Endpoint      | Description          | Body Example |
 |--------|--------------|----------------------|--------------|
@@ -228,4 +300,3 @@ npm run start:dev
 - Implement API documentation using `Swagger`
 
 ---
-Note: Updation required
